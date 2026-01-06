@@ -1,0 +1,88 @@
+name: 🚀 Deploy RBeverything System
+
+on:
+  push:
+    branches:
+      - main      # Untuk Production
+      - sandbox   # Untuk Staging/Sandbox
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy Process
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+
+    # ----------------------------------------------------------------
+    # TAHAP 1: SIAPKAN DEPENDENCY & ASET (Build di Server GitHub)
+    # ----------------------------------------------------------------
+    - name: 🔨 Install Dependencies & Build Assets
+      run: |
+        composer install --no-dev --optimize-autoloader
+        npm install
+        npm run build
+
+    # ================================================================
+    # SKENARIO A: DEPLOY KE SANDBOX / STAGING
+    # Jika push ke branch 'sandbox'
+    # ================================================================
+    
+    # A.1. Upload CORE (Kodingan) ke folder projects/staging
+    - name: 📂 Sync Core Files (Staging)
+      if: github.ref == 'refs/heads/sandbox'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /projects/staging/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          .env
+          public/** # Public jangan ditaruh disini
+
+    # A.2. Upload PUBLIC (Aset) ke folder public_html/staging
+    - name: 📂 Sync Public Assets (Staging)
+      if: github.ref == 'refs/heads/sandbox'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./public/
+        server-dir: /public_html/staging.web.rbeverything.com/
+
+    # ================================================================
+    # SKENARIO B: DEPLOY KE PRODUCTION
+    # Jika push ke branch 'main'
+    # ================================================================
+
+    # B.1. Upload CORE (Kodingan) ke folder projects/production
+    - name: 📂 Sync Core Files (Production)
+      if: github.ref == 'refs/heads/main'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /projects/production/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          .env
+          public/** # Public jangan ditaruh disini
+
+    # B.2. Upload PUBLIC (Aset) ke folder public_html (Root Domain)
+    - name: 📂 Sync Public Assets (Production)
+      if: github.ref == 'refs/heads/main'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./public/
+        server-dir: /public_html/
