@@ -44,7 +44,7 @@ return [
             // --- LOGIKA DINAMIS (LANGSUNG EKSEKUSI) ---
             'root' => (env('APP_ENV') === 'production') 
                         ? base_path('../../public_html/storage') 
-                        : base_path('../../public_html/staging/storage'),
+                        : base_path('../../public_html/staging.web.rbeverything.com/storage'),
             'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
