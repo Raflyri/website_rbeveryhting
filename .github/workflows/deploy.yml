@@ -36,7 +36,7 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /projects/sanbox/
+        server-dir: /projects/sandbox/
         exclude: |
           **/.git*
           **/.git*/**
