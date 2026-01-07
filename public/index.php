@@ -18,9 +18,9 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 // 1. Cek Jalur STAGING (Prioritas)
 // Karena staging ada di subfolder, kita harus mundur 2 langkah (../../)
 // Mencari: /home/user/projects/staging/vendor/autoload.php
-if (file_exists(__DIR__.'../../../projects/sandbox/vendor/autoload.php')) {
-    require __DIR__.'../../../projects/sandbox/vendor/autoload.php';
-    $app = require __DIR__.'../../../projects/sandbox/bootstrap/app.php';
+if (file_exists(__DIR__.'../../projects/sandbox/vendor/autoload.php')) {
+    require __DIR__.'../../projects/sandbox/vendor/autoload.php';
+    $app = require __DIR__.'../../projects/sandbox/bootstrap/app.php';
 }
 
 // 2. Cek Jalur PRODUCTION
