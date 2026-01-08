@@ -40,11 +40,12 @@ return [
 
         'public' => [
             'driver' => 'local',
-            // --- LOGIKA DINAMIS ---
-            // --- LOGIKA DINAMIS (LANGSUNG EKSEKUSI) ---
-            'root' => (env('APP_ENV') === 'production') 
-                        ? base_path('../../public_html/storage') 
-                        : base_path('../../public_html/staging.web.rbeverything.com/storage'),
+            // --- LOGIKA DINAMIS YANG BENAR ---
+            'root' => match (env('APP_ENV')) {
+                'local'      => storage_path('app/public'),
+                'production' => base_path('../../public_html/storage'),
+                default      => base_path('../../public_html/staging.web.rbeverything.com/storage'),
+            },
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
