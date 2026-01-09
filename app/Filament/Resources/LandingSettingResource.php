@@ -48,6 +48,17 @@ class LandingSettingResource extends Resource
                     ->acceptedFileTypes(['video/mp4'])
                     ->directory('landing-assets')
                     ->maxSize(50000),
+
+                Forms\Components\Section::make('Status Website')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_maintenance_mode')
+                            ->label('Maintenance Mode (Coming Soon)')
+                            ->helperText('Jika aktif, pengunjung akan melihat halaman Coming Soon. Jika mati, pengunjung melihat Website Utama.')
+                            ->onColor('danger') // Merah artinya Maintenance/Berhenti
+                            ->offColor('success') // Hijau artinya Live/Jalan
+                            ->default(true)
+                            ->required(),
+                    ]),
             ]);
     }
 

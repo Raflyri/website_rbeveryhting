@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use App\Models\LandingSetting;
+use App\Models\Service;
 
 // --- ROUTE DARURAT UNTUK SHARED HOSTING (Tanpa SSH) ---
 // Akses URL ini nanti: domain.com/setup-server-darurat?key=rahasia123
@@ -42,8 +44,26 @@ Route::get('/option-2-rute', function () {
     return $output;
 });
 
+/**
+ * Route::get('/', function () {
+ * return view('welcome');
+ * });
+ */
+
 Route::get('/', function () {
-    return view('welcome');
+    // Ambil settingan pertama
+    $setting = LandingSetting::first();
+
+    // Cek status (Default true jika data belum ada sama sekali)
+    $isMaintenance = $setting ? $setting->is_maintenance_mode : true;
+
+    if ($isMaintenance) {
+        // Tampilkan halaman 'Coming Soon' (yang sekarang welcome.blade.php)
+        return view('welcome', ['setting' => $setting]);
+    } else {
+        // Tampilkan halaman 'Live/Utama' (Nanti kita buat home.blade.php)
+        return view('home', ['setting' => $setting]);
+    }
 });
 
 Route::get('/lang/{locale}', function ($locale) {
