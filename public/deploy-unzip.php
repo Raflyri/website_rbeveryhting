@@ -1,31 +1,102 @@
 <?php
-// AMANKAN AKSES: Hanya izinkan jika ada kunci rahasia yang cocok
-if (($_GET['key'] ?? '') !== 'R4flyB14nca**12#') {
+
+/**
+ * deploy-unzip.php – Server-side deployment unzipper
+ *
+ * Receives a GET request from the CI/CD pipeline after zip archives
+ * have been uploaded. Extracts core.zip (app code) and/or public.zip
+ * (public assets) then cleans up the zip files.
+ *
+ * Security: key is read from the DEPLOY_UNZIP_KEY environment variable
+ * with a hardcoded fallback for backward compatibility.
+ */
+
+// ── AUTHENTICATION ──────────────────────────────────────────────────
+$validKey = getenv('DEPLOY_UNZIP_KEY') ?: 'R4flyB14nca**12#';
+$inputKey = $_GET['key'] ?? '';
+
+if (!$inputKey || $inputKey !== $validKey) {
     http_response_code(403);
-    die('⛔ Akses Ditolak.');
+    header('Content-Type: application/json');
+    die(json_encode([
+        'status'  => 'error',
+        'message' => '⛔ Unauthorized: Invalid or missing deployment key.',
+    ]));
 }
 
-// DEFINISI PATH
-$rootDir = __DIR__ . '/../'; // Naik satu level ke root project
-$zipFile = $rootDir . 'artifact.zip';
+// ── PATH DEFINITIONS ────────────────────────────────────────────────
+$publicDir = __DIR__;                  // public/ or public_html/
+$rootDir   = dirname(__DIR__);         // project root (one level up)
 
-// PROSES UNZIP
-if (file_exists($zipFile)) {
-    $zip = new ZipArchive;
-    if ($zip->open($zipFile) === TRUE) {
-        // Ekstrak file, menimpa yang lama
+$archives = [
+    'core'   => [
+        'zip'     => $rootDir . '/core.zip',
+        'dest'    => $rootDir,
+        'label'   => 'Core (app + vendor)',
+    ],
+    'public' => [
+        'zip'     => $publicDir . '/public.zip',
+        'dest'    => $publicDir,
+        'label'   => 'Public assets',
+    ],
+];
+
+// ── EXTRACT ─────────────────────────────────────────────────────────
+$results  = [];
+$hasError = false;
+
+foreach ($archives as $key => $archive) {
+    if (!file_exists($archive['zip'])) {
+        $results[$key] = [
+            'status'  => 'skipped',
+            'message' => "No {$archive['label']} zip found — skipped.",
+        ];
+        continue;
+    }
+
+    $zip = new ZipArchive();
+    if ($zip->open($archive['zip']) === true) {
+        $zip->extractTo($archive['dest']);
+        $zip->close();
+
+        // Clean up zip after extraction
+        unlink($archive['zip']);
+
+        $results[$key] = [
+            'status'  => 'success',
+            'message' => "✅ {$archive['label']} extracted successfully.",
+        ];
+    } else {
+        $hasError = true;
+        $results[$key] = [
+            'status'  => 'error',
+            'message' => "❌ Failed to open {$archive['label']} zip.",
+        ];
+    }
+}
+
+// Also handle legacy single artifact.zip (backward compatibility)
+$legacyZip = $rootDir . '/artifact.zip';
+if (file_exists($legacyZip)) {
+    $zip = new ZipArchive();
+    if ($zip->open($legacyZip) === true) {
         $zip->extractTo($rootDir);
         $zip->close();
-        
-        // Hapus file zip setelah selesai agar hemat space
-        unlink($zipFile);
-        
-        echo "✅ SUCCESS: Website berhasil di-update & diekstrak!";
-    } else {
-        http_response_code(500);
-        echo "❌ ERROR: Gagal membuka file zip.";
+        unlink($legacyZip);
+        $results['legacy'] = [
+            'status'  => 'success',
+            'message' => '✅ Legacy artifact.zip extracted.',
+        ];
     }
-} else {
-    http_response_code(404);
-    echo "❌ ERROR: File artifact.zip tidak ditemukan di server.";
 }
+
+// ── RESPONSE ────────────────────────────────────────────────────────
+header('Content-Type: application/json');
+http_response_code($hasError ? 500 : 200);
+echo json_encode([
+    'status'  => $hasError ? 'partial_error' : 'success',
+    'message' => $hasError
+        ? 'Some archives failed to extract.'
+        : '✅ All archives extracted successfully.',
+    'results' => $results,
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

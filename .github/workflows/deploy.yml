@@ -3,19 +3,20 @@ name: 🚀 Deploy RBeverything System
 on:
   push:
     branches:
-      - main # Untuk Production
-      - sandbox # Untuk Staging/Sandbox
+      - main # Production
+      - sandbox # Staging/Sandbox
 
 jobs:
   web-deploy:
     name: 🎉 Deploy Process
     runs-on: ubuntu-latest
+
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
       # ----------------------------------------------------------------
-      # TAHAP 1: SIAPKAN DEPENDENCY & ASET (Build di Server GitHub)
+      # STAGE 1: INSTALL DEPENDENCIES & BUILD ASSETS
       # ----------------------------------------------------------------
       - name: 🔨 Install Dependencies & Build Assets
         run: |
@@ -23,77 +24,88 @@ jobs:
           npm install
           npm run build
 
-      # ================================================================
-      # SKENARIO A: DEPLOY KE SANDBOX / STAGING
-      # Jika push ke branch 'sandbox'
-      # ================================================================
+      # ----------------------------------------------------------------
+      # STAGE 2: CREATE ZIP ARCHIVES
+      # ----------------------------------------------------------------
+      - name: 📦 Create Core Archive
+        run: |
+          zip -r /tmp/core.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "node_modules/*" \
+            -x "public/*" \
+            -x ".env" \
+            -x ".env.*" \
+            -x "*.zip"
 
-      # A.1. Upload CORE (Kodingan) ke folder projects/staging
-      - name: 📂 Sync Core Files (Staging)
+      - name: 📦 Create Public Archive
+        run: |
+          cd public
+          zip -r /tmp/public.zip .
+
+      # ----------------------------------------------------------------
+      # STAGE 3: UPLOAD VIA LFTP (2 files instead of ~15,000+)
+      # ----------------------------------------------------------------
+
+      # ── SANDBOX ─────────────────────────────────────────────────────
+      - name: 📂 Upload Archives (Staging)
         if: github.ref == 'refs/heads/sandbox'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /projects/sandbox/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env
-            public/** # Public jangan ditaruh disini
+        run: |
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" <<EOF
+          set ssl:verify-certificate no
+          set net:timeout 60
+          set net:max-retries 3
+          set net:reconnect-interval-base 5
+          put /tmp/core.zip -o /projects/sandbox/core.zip
+          put /tmp/public.zip -o /public_html/staging.web.rbeverything.com/public.zip
+          bye
+          EOF
 
-      # A.2. Upload PUBLIC (Aset) ke folder public_html/staging
-      - name: 📂 Sync Public Assets (Staging)
-        if: github.ref == 'refs/heads/sandbox'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./public/
-          server-dir: /public_html/staging.web.rbeverything.com/
-
-      # ================================================================
-      # SKENARIO B: DEPLOY KE PRODUCTION
-      # Jika push ke branch 'main'
-      # ================================================================
-
-      # B.1. Upload CORE (Kodingan) ke folder projects/production
-      - name: 📂 Sync Core Files (Production)
+      # ── PRODUCTION ──────────────────────────────────────────────────
+      - name: 📂 Upload Archives (Production)
         if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /projects/production/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env
-            public/** # Public jangan ditaruh disini
+        run: |
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" <<EOF
+          set ssl:verify-certificate no
+          set net:timeout 60
+          set net:max-retries 3
+          set net:reconnect-interval-base 5
+          put /tmp/core.zip -o /projects/production/core.zip
+          put /tmp/public.zip -o /public_html/public.zip
+          bye
+          EOF
 
-      # B.2. Upload PUBLIC (Aset) ke folder public_html (Root Domain)
-      - name: 📂 Sync Public Assets (Production)
-        if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./public/
-          server-dir: /public_html/
+      # ----------------------------------------------------------------
+      # STAGE 4: TRIGGER SERVER-SIDE UNZIP
+      # ----------------------------------------------------------------
+      - name: 📦 Trigger Unzip on Server
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            SITE_URL="https://rbeverything.com"
+          else
+            SITE_URL="https://staging.web.rbeverything.com"
+          fi
 
-      # ================================================================
-      # TAHAP 3: FINALISASI (MIGRATE & CACHE CLEAR)
-      # ================================================================
+          echo "🔓 Triggering unzip at $SITE_URL..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            "$SITE_URL/deploy-unzip.php?key=${{ secrets.DEPLOY_UNZIP_KEY }}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Response ($HTTP_CODE): $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Unzip failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+      # ----------------------------------------------------------------
+      # STAGE 5: FINALIZE (MIGRATE & CACHE)
+      # ----------------------------------------------------------------
       - name: 🚀 Trigger System Updates (Migrate & Cache)
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-             curl -X GET "https://rbeverything.com/system/deploy/trigger?key=${{ secrets.DEPLOY_SECRET }}"
+             curl -s -X GET "https://rbeverything.com/system/deploy/trigger?key=${{ secrets.DEPLOY_SECRET }}"
           elif [ "${{ github.ref }}" == "refs/heads/sandbox" ]; then
-             curl -X GET "https://staging.web.rbeverything.com/system/deploy/trigger?key=${{ secrets.DEPLOY_SECRET }}"
+             curl -s -X GET "https://staging.web.rbeverything.com/system/deploy/trigger?key=${{ secrets.DEPLOY_SECRET }}"
           fi
