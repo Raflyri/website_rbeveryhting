@@ -6,9 +6,24 @@ use Illuminate\Support\Facades\Session;
 use App\Models\LandingSetting;
 use App\Models\Service;
 use App\Http\Controllers\System\DeploymentController;
+use App\Http\Controllers\Base64ConverterController;
+use App\Http\Controllers\Base64ToolController;
 
 // --- SYSTEM DEPLOYMENT ROUTE ---
 Route::get('/system/deploy/trigger', [DeploymentController::class, 'handle']);
+
+// --- TOOLS ROUTES ---
+Route::get('/tools/base64', [Base64ConverterController::class, 'index'])->name('tools.base64');
+
+Route::prefix('tools/base64')->name('tools.base64.')->group(function () {
+    // SPA: fetch panel HTML for a tool (no full reload)
+    Route::get('ui/{slug}',  [Base64ToolController::class, 'panel'])->name('panel');
+    // SPA: JSON form submission endpoint
+    Route::post('api/{slug}', [Base64ToolController::class, 'apiHandle'])->name('api');
+    // Classic (fallback / no-JS)
+    Route::get('{slug}', [Base64ToolController::class, 'show'])->name('show');
+    Route::post('{slug}', [Base64ToolController::class, 'handle'])->name('handle');
+});
 
 /**
  * Route::get('/', function () {
@@ -33,10 +48,10 @@ Route::get('/', function () {
 });
 
 Route::get('/lang/{locale}', function ($locale) {
-    $availabeLocales = ['en_US', 'en_GB', 'id', 'ms', 'ja'];
+    $availableLocales = ['en_US', 'en_GB', 'id', 'ms', 'ja'];
 
-    if (in_array($locale, $availabeLocales)) {
-        session::put('locale', $locale);
+    if (in_array($locale, $availableLocales)) {
+        Session::put('locale', $locale);
     }
 
     return redirect()->back();

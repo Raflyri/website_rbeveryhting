@@ -5,6 +5,9 @@
         </div>
 
         <nav class="hidden md:flex gap-8 text-white/80 text-sm font-medium">
+            <a href="{{ route('tools.base64') }}" class="hover:text-white transition">
+                Tools
+            </a>
             <a href="#" class="hover:text-white transition">
                 {{ __('text.menu_about') }}
             </a>

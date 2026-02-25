@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'base64_api' => [
+        'base_url' => env('BASE64_API_BASE_URL', 'https://base64-api.rbeverything.com/'),
+    ],
+
 ];

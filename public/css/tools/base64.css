@@ -1,0 +1,163 @@
+/* Base64 Tools CSS */
+
+/* Glassmorphism Card */
+.glass-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.15);
+}
+
+/* Gradient Text */
+.clip-text-gradient {
+    background: linear-gradient(to right, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Tabs */
+.tab-active {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.tab-inactive {
+    background-color: transparent;
+    color: #94a3b8;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.tab-inactive:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Form Elements */
+.base64-input {
+    width: 100%;
+    border-radius: 0.75rem; /* rounded-xl */
+    background-color: rgba(2, 6, 23, 0.7); /* bg-slate-950/70 */
+    border: 1px solid rgba(51, 65, 85, 0.8); /* border-slate-700/80 */
+    padding: 0.5rem 0.75rem; /* px-3 py-2 */
+    font-size: 0.875rem; /* text-sm */
+    color: #f1f5f9; /* text-slate-100 */
+}
+
+.base64-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.7); /* ring-blue-500/70 */
+    border-color: #3b82f6; /* border-blue-500 */
+}
+
+.base64-input::placeholder {
+    color: #64748b; /* text-slate-500 */
+}
+
+/* Result Pre Area */
+.base64-result-pre {
+    margin-top: 0.25rem;
+    max-height: 20rem; /* max-h-80 */
+    overflow: auto;
+    border-radius: 0.5rem; /* rounded-lg */
+    background-color: rgba(2, 6, 23, 0.8); /* bg-slate-950/80 */
+    padding: 0.75rem; /* p-3 */
+    font-size: 0.75rem; /* text-xs */
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace; /* font-mono */
+    color: #e2e8f0; /* text-slate-200 */
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ─── SPA Sidebar ────────────────────────────────────────────────────── */
+.spa-sidebar-item {
+    color: #94a3b8;
+    background: transparent;
+}
+.spa-sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+.spa-item-active.spa-sidebar-item {
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+.spa-item-active.spa-sidebar-item span.w-8 {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+/* ─── Category Filter Pills ─────────────────────────────────────────── */
+.spa-cat-active {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border-color: #3b82f6;
+}
+.spa-cat-inactive {
+    background-color: transparent;
+    color: #64748b;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+.spa-cat-inactive:hover {
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Panel Fade-in ─────────────────────────────────────────────────── */
+@keyframes spa-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.spa-panel {
+    animation: spa-fade-in 0.25s ease-out both;
+}
+
+/* ─── Skeleton Shimmer ──────────────────────────────────────────────── */
+@keyframes shimmer {
+    0% {
+        background-position: -400px 0;
+    }
+    100% {
+        background-position: 400px 0;
+    }
+}
+.spa-skeleton > * {
+    background: linear-gradient(
+        90deg,
+        rgba(51, 65, 85, 0.4) 0%,
+        rgba(71, 85, 105, 0.6) 50%,
+        rgba(51, 65, 85, 0.4) 100%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s infinite linear;
+    border-radius: 0.5rem;
+}
+
+/* ─── Scrollbar hide (sidebar) ──────────────────────────────────────── */
+.scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

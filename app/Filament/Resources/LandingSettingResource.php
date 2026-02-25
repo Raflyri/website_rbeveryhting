@@ -18,7 +18,8 @@ class LandingSettingResource extends Resource
 {
     protected static ?string $model = LandingSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cog';
+    protected static ?string $navigationGroup = 'Landing Page';
 
     use Translatable;
 

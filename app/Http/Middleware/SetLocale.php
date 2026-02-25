@@ -18,7 +18,7 @@ class SetLocale
         if (session()->has('locale')){
             app()->setLocale(session('locale'));
         } else {
-            app()->setLocale('en-US');
+            app()->setLocale('en_US');
         }
 
         return $next($request);
