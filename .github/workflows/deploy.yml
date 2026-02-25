@@ -46,6 +46,8 @@ jobs:
       # ----------------------------------------------------------------
       # STAGE 3: UPLOAD VIA LFTP (2 files instead of ~15,000+)
       # ----------------------------------------------------------------
+      - name: 📥 Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
 
       # ── SANDBOX ─────────────────────────────────────────────────────
       - name: 📂 Upload Archives (Staging)
