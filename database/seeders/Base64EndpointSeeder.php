@@ -24,7 +24,7 @@ class Base64EndpointSeeder extends Seeder
                 'category' => 'text',
                 'sort_order' => 1,
                 'request_params' => [
-                    ['field_key' => 'text', 'field_label' => 'Input text', 'field_type' => 'textarea', 'placeholder' => 'Halo Rafly, ini tes encode!', 'helper_text' => 'Your text will be sent securely to the Base64 API and encoded server-side.', 'is_required' => true, 'sort_order' => 1],
+                    ['field_key' => 'text', 'field_label' => 'Input text', 'field_type' => 'textarea', 'placeholder' => 'Halo, ini kalimat untuk di encode!', 'helper_text' => 'Your text will be sent securely to the Base64 API and encoded server-side.', 'is_required' => true, 'sort_order' => 1],
                 ],
                 'response_params' => [
                     ['field_key' => 'status', 'field_label' => 'Status', 'field_type' => 'string', 'sort_order' => 1],

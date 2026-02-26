@@ -26,12 +26,27 @@ if (!$inputKey || $inputKey !== $validKey) {
 
 // ── PATH DEFINITIONS ────────────────────────────────────────────────
 $publicDir = __DIR__;                  // public/ or public_html/
-$rootDir   = dirname(__DIR__);         // project root (one level up)
+
+// Detect environment based on path
+if (strpos(__DIR__, 'staging') !== false || strpos(__DIR__, 'sandbox') !== false) {
+    // Staging path: /home/user/public_html/staging.web.rbeverything.com
+    $homeDir = \dirname(\dirname(__DIR__));
+    $coreDir = $homeDir . '/projects/sandbox';
+} else {
+    // Production path: /home/user/public_html
+    $homeDir = \dirname(__DIR__);
+    $coreDir = $homeDir . '/projects/production';
+}
+
+// Fallback for local testing or old structure where core.zip is just one level up
+if (!file_exists($coreDir . '/core.zip') && file_exists(dirname(__DIR__) . '/core.zip')) {
+    $coreDir = dirname(__DIR__);
+}
 
 $archives = [
     'core'   => [
-        'zip'     => $rootDir . '/core.zip',
-        'dest'    => $rootDir,
+        'zip'     => $coreDir . '/core.zip',
+        'dest'    => $coreDir,
         'label'   => 'Core (app + vendor)',
     ],
     'public' => [
