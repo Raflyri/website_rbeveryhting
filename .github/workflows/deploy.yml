@@ -58,6 +58,9 @@ jobs:
           set net:timeout 60
           set net:max-retries 3
           set net:reconnect-interval-base 5
+          # Upload the unzip script FIRST so the server has it ready
+          put public/deploy-unzip.php -o /public_html/staging.web.rbeverything.com/deploy-unzip.php
+          # Then upload the zip archives
           put /tmp/core.zip -o /projects/sandbox/core.zip
           put /tmp/public.zip -o /public_html/staging.web.rbeverything.com/public.zip
           bye
@@ -72,6 +75,9 @@ jobs:
           set net:timeout 60
           set net:max-retries 3
           set net:reconnect-interval-base 5
+          # Upload the unzip script FIRST so the server has it ready
+          put public/deploy-unzip.php -o /public_html/deploy-unzip.php
+          # Then upload the zip archives
           put /tmp/core.zip -o /projects/production/core.zip
           put /tmp/public.zip -o /public_html/public.zip
           bye
@@ -80,22 +86,31 @@ jobs:
       # ----------------------------------------------------------------
       # STAGE 4: TRIGGER SERVER-SIDE UNZIP
       # ----------------------------------------------------------------
-      - name: 📦 Trigger Unzip on Server
+      - name: 📦 Trigger Unzip (Staging)
+        if: github.ref == 'refs/heads/sandbox'
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            SITE_URL="https://rbeverything.com"
-          else
-            SITE_URL="https://staging.web.rbeverything.com"
-          fi
-
-          echo "🔓 Triggering unzip at $SITE_URL..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "$SITE_URL/deploy-unzip.php?key=${{ secrets.DEPLOY_UNZIP_KEY }}")
+          echo "🔓 Triggering unzip at staging..."
+          RESPONSE=$(curl -s --connect-timeout 30 --max-time 120 --retry 2 --retry-delay 5 \
+            -w "\n%{http_code}" \
+            "https://staging.web.rbeverything.com/deploy-unzip.php?key=${{ secrets.DEPLOY_UNZIP_KEY }}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)
-
           echo "Response ($HTTP_CODE): $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Unzip failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
 
+      - name: 📦 Trigger Unzip (Production)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "🔓 Triggering unzip at production..."
+          RESPONSE=$(curl -s --connect-timeout 30 --max-time 120 --retry 2 --retry-delay 5 \
+            -w "\n%{http_code}" \
+            "https://rbeverything.com/deploy-unzip.php?key=${{ secrets.DEPLOY_UNZIP_KEY }}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          echo "Response ($HTTP_CODE): $BODY"
           if [ "$HTTP_CODE" != "200" ]; then
             echo "❌ Unzip failed with HTTP $HTTP_CODE"
             exit 1
