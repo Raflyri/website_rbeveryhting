@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Http\Controllers\System\DeploymentController;
 use App\Http\Controllers\Base64ConverterController;
 use App\Http\Controllers\Base64ToolController;
+use App\Http\Controllers\PageController;
 
 // --- SYSTEM DEPLOYMENT ROUTE ---
 Route::get('/system/deploy/trigger', [DeploymentController::class, 'handle']);
@@ -56,3 +57,6 @@ Route::get('/lang/{locale}', function ($locale) {
 
     return redirect()->back();
 })->name('switch.language');
+
+// --- CMS PAGES ROUTE ---
+Route::get('/p/{slug}', [PageController::class, 'show'])->name('page.show');

@@ -19,7 +19,7 @@ $responseParams = $endpoint->responseParams()->get();
             @if(in_array($param->field_type, ['code', 'string', 'json']))
             <button
                 type="button"
-                onclick="navigator.clipboard.writeText(this.closest('[data-copyable]').querySelector('[data-value]').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 1500); })"
+                onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.querySelector('[data-value]').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 1500); })"
                 class="text-xs text-blue-400 hover:text-blue-300 transition-colors">
                 Copy
             </button>

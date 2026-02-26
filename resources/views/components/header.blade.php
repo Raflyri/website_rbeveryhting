@@ -1,3 +1,12 @@
+@php
+$siteSetting = \App\Models\SiteSetting::first();
+$headerMenu = $siteSetting ? $siteSetting->header_menu : [
+['label' => 'Tools', 'url' => route('tools.base64')],
+['label' => __('text.menu_about'), 'url' => '#'],
+['label' => __('text.menu_contact'), 'url' => '#'],
+];
+@endphp
+
 <header class="fixed top-0 w-full z-50 transition-all duration-300 bg-black/50 backdrop-blur-md border-b border-white/10">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div class="text-2xl font-bold text-white tracking-widest leading-none">
@@ -6,9 +15,11 @@
 
         <!-- Desktop Menu -->
         <nav class="hidden md:flex gap-8 text-white/80 text-sm font-medium items-center">
-            <a href="{{ route('tools.base64') }}" class="hover:text-white transition">Tools</a>
-            <a href="#" class="hover:text-white transition">{{ __('text.menu_about') }}</a>
-            <a href="#" class="hover:text-white transition">{{ __('text.menu_contact') }}</a>
+            @if($headerMenu && is_array($headerMenu))
+            @foreach($headerMenu as $menuItem)
+            <a href="{{ $menuItem['url'] ?? '#' }}" class="hover:text-white transition">{{ $menuItem['label'] ?? '' }}</a>
+            @endforeach
+            @endif
         </nav>
 
         <!-- Mobile Menu Toggle Button -->
@@ -22,9 +33,11 @@
     <!-- Mobile Dropdown Menu -->
     <div id="mobile-menu-dropdown" class="hidden md:hidden bg-slate-900 border-b border-white/10 px-6 py-4 absolute w-full top-20 left-0 shadow-2xl">
         <nav class="flex flex-col gap-5 text-white/80 text-sm font-medium">
-            <a href="{{ route('tools.base64') }}" class="block hover:text-white transition">Tools</a>
-            <a href="#" class="block hover:text-white transition">{{ __('text.menu_about') }}</a>
-            <a href="#" class="block hover:text-white transition">{{ __('text.menu_contact') }}</a>
+            @if($headerMenu && is_array($headerMenu))
+            @foreach($headerMenu as $menuItem)
+            <a href="{{ $menuItem['url'] ?? '#' }}" class="block hover:text-white transition">{{ $menuItem['label'] ?? '' }}</a>
+            @endforeach
+            @endif
 
             <div class="border-t border-white/10 pt-4 mt-2">
                 <p class="text-xs text-slate-500 mb-3 tracking-widest uppercase">Language / Bahasa</p>
