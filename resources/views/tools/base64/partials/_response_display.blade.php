@@ -29,7 +29,7 @@ $responseParams = $endpoint->responseParams()->get();
         <div data-copyable>
             @switch($param->field_type)
             @case('string')
-            <div class="rounded-lg bg-slate-800/60 border border-white/5 px-4 py-2.5 text-sm text-slate-100 font-mono" data-value>{{ is_array($value) ? json_encode($value) : $value }}</div>
+            <div class="rounded-lg bg-slate-800/60 border border-white/5 px-4 py-3 text-sm text-slate-100 font-mono max-h-60 overflow-y-auto break-words whitespace-pre-wrap" data-value>{{ is_array($value) ? json_encode($value) : $value }}</div>
             @break
 
             @case('code')
@@ -62,7 +62,7 @@ $responseParams = $endpoint->responseParams()->get();
             @break
 
             @default
-            <div class="rounded-lg bg-slate-800/60 border border-white/5 px-4 py-2.5 text-sm text-slate-100" data-value>{{ is_array($value) ? json_encode($value) : $value }}</div>
+            <div class="rounded-lg bg-slate-800/60 border border-white/5 px-4 py-3 text-sm text-slate-100 max-h-60 overflow-y-auto break-words whitespace-pre-wrap" data-value>{{ is_array($value) ? json_encode($value) : $value }}</div>
             @endswitch
         </div>
 

@@ -42,14 +42,14 @@
     {{-- ─── MOBILE: Sidebar overlay backdrop ──────────────────────────────── --}}
     <div id="spa-sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
 
-    <main class="min-h-screen pt-16 relative overflow-hidden">
+    <main class="min-h-[calc(100vh-160px)] pt-24 relative overflow-hidden flex flex-col">
 
         {{-- Background decorations --}}
         <div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
         <div class="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute top-60 -left-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 relative z-10">
+        <div class="max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12 relative z-10 flex-1">
 
             {{-- ─── Page title row ─────────────────────────────────────────── --}}
             <div class="flex items-center justify-between gap-4 mb-6">
