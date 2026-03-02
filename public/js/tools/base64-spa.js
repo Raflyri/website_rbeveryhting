@@ -380,6 +380,10 @@
     function bindToolItems() {
         document.querySelectorAll("[data-spa-item]").forEach((el) => {
             el.addEventListener("click", function (e) {
+                if (window.isDraggingTab) {
+                    e.preventDefault();
+                    return;
+                }
                 e.preventDefault();
                 loadTool(this.dataset.spaItem);
             });
@@ -405,7 +409,47 @@
         });
     }
 
-    // ─── (Mobile toggle removed in favor of horizontal tabs) ──────────────────────
+    // ─── Mobile tabs drag-to-scroll (Swipe feature) ───────────────────────────────
+    function bindMobileTabsSwipe() {
+        const slider = document.getElementById("spa-mobile-tabs");
+        if (!slider) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        window.isDraggingTab = false;
+
+        slider.addEventListener("mousedown", (e) => {
+            isDown = true;
+            window.isDraggingTab = false;
+            slider.classList.add("active");
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener("mouseleave", () => {
+            isDown = false;
+            slider.classList.remove("active");
+            setTimeout(() => (window.isDraggingTab = false), 50);
+        });
+
+        slider.addEventListener("mouseup", () => {
+            isDown = false;
+            slider.classList.remove("active");
+            setTimeout(() => (window.isDraggingTab = false), 50);
+        });
+
+        slider.addEventListener("mousemove", (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll-fast
+            if (Math.abs(walk) > 5) {
+                window.isDraggingTab = true;
+            }
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    }
 
     // ─── Back / Forward ───────────────────────────────────────────────────────────
     window.addEventListener("popstate", function (e) {
@@ -432,6 +476,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         bindToolItems();
         bindCategoryFilter();
+        bindMobileTabsSwipe();
 
         const initialSlug = slugFromPath();
         if (initialSlug && initialSlug !== "ui" && initialSlug !== "api") {

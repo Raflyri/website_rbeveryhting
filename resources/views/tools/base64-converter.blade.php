@@ -66,7 +66,7 @@
             </div>
 
             {{-- ─── MOBILE: Horizontal scrollable tabs ───────────────────────── --}}
-            <div class="lg:hidden flex overflow-x-auto whitespace-nowrap space-x-2 pb-4 mb-4 scrollbar-hide">
+            <div id="spa-mobile-tabs" class="lg:hidden flex overflow-x-auto whitespace-nowrap space-x-2 pb-4 mb-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none">
                 @foreach($endpoints->whereNotNull('api_url') as $endpoint)
                 <button
                     data-spa-item="{{ $endpoint->slug }}"
