@@ -88,11 +88,11 @@
 
                         {{-- Category filter pills --}}
                         <div class="flex flex-wrap gap-1.5 pb-1">
-                            <button data-spa-category="all" class="spa-cat-active text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
+                            <button data-spa-filter="all" class="spa-cat-active text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
                                 {{ __('text.category_all') }}
                             </button>
                             @foreach($endpoints->pluck('category')->unique()->filter()->sort()->values() as $cat)
-                            <button data-spa-category="{{ $cat }}" class="spa-cat-inactive text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
+                            <button data-spa-filter="{{ $cat }}" class="spa-cat-inactive text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
                                 {{ ucfirst($cat) }}
                             </button>
                             @endforeach

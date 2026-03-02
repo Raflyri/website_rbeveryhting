@@ -388,15 +388,13 @@
 
     // ─── Category filter ───────────────────────────────────────────────────────────
     function bindCategoryFilter() {
-        document.querySelectorAll("[data-spa-category]").forEach((btn) => {
+        document.querySelectorAll("[data-spa-filter]").forEach((btn) => {
             btn.addEventListener("click", function () {
-                const cat = this.dataset.spaCategory;
-                document
-                    .querySelectorAll("[data-spa-category]")
-                    .forEach((b) => {
-                        b.classList.toggle("spa-cat-active", b === this);
-                        b.classList.toggle("spa-cat-inactive", b !== this);
-                    });
+                const cat = this.dataset.spaFilter;
+                document.querySelectorAll("[data-spa-filter]").forEach((b) => {
+                    b.classList.toggle("spa-cat-active", b === this);
+                    b.classList.toggle("spa-cat-inactive", b !== this);
+                });
                 document.querySelectorAll("[data-spa-item]").forEach((item) => {
                     item.style.display =
                         cat === "all" || item.dataset.spaCategory === cat
