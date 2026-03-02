@@ -39,8 +39,7 @@
 
     <x-header />
 
-    {{-- ─── MOBILE: Sidebar overlay backdrop ──────────────────────────────── --}}
-    <div id="spa-sidebar-overlay" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm hidden lg:hidden"></div>
+    {{-- ─── MOBILE: Sidebar overlay backdrop removed ─────────────────────────── --}}
 
     <main class="min-h-[calc(100vh-160px)] pt-24 relative overflow-x-hidden flex flex-col">
 
@@ -63,26 +62,27 @@
                     </h1>
                 </div>
 
-                {{-- Mobile: hamburger sidebar toggle --}}
-                <button id="spa-sidebar-toggle"
-                    class="lg:hidden inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-white/10 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">
-                    <i data-feather="menu" class="w-4 h-4"></i>
-                    {{ __('text.b64_title_tools') }}
+                {{-- Mobile hamburger button removed in favor of horizontal tabs --}}
+            </div>
+
+            {{-- ─── MOBILE: Horizontal scrollable tabs ───────────────────────── --}}
+            <div class="lg:hidden flex overflow-x-auto whitespace-nowrap space-x-2 pb-4 mb-4 scrollbar-hide">
+                @foreach($endpoints->whereNotNull('api_url') as $endpoint)
+                <button
+                    data-spa-item="{{ $endpoint->slug }}"
+                    data-spa-category="{{ $endpoint->category }}"
+                    class="spa-mobile-tab bg-slate-800/60 border border-white/5 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+                    {{ $endpoint->name }}
                 </button>
+                @endforeach
             </div>
 
             {{-- ─── SPA App Layout ──────────────────────────────────────────── --}}
             <div class="flex gap-6 items-start relative">
 
-                {{-- ─── SIDEBAR (mobile: drawer, desktop: sticky) ──────────── --}}
+                {{-- ─── SIDEBAR (desktop only now) ───────────────────────────── --}}
                 <aside id="spa-sidebar-drawer"
-                    class="fixed lg:sticky top-0 left-0 z-50 h-[100dvh] lg:h-auto lg:z-auto
-                           w-72 lg:w-64 xl:w-72
-                           transform -translate-x-full lg:translate-x-0
-                           transition-transform duration-300 ease-in-out
-                           flex flex-col
-                           pt-16 lg:pt-4 lg:top-24
-                           bg-slate-950 border-r border-white/5 lg:border-none lg:bg-transparent shadow-2xl lg:shadow-none">
+                    class="sticky top-24 left-0 z-auto h-auto w-64 xl:w-72 hidden lg:flex flex-col bg-transparent">
 
                     <div class="flex-1 overflow-y-auto px-3 pb-6 space-y-5 scrollbar-hide">
 

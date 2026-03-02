@@ -71,10 +71,22 @@
         return `Request failed (HTTP ${httpStatus})`;
     }
 
-    // ─── Sidebar active state ─────────────────────────────────────────────────────
+    // ─── Component active state (Sidebar & Mobile Tabs) ───────────────────────────
     function setActiveItem(slug) {
         document.querySelectorAll("[data-spa-item]").forEach((el) => {
             el.classList.toggle("spa-item-active", el.dataset.spaItem === slug);
+
+            // Auto scroll to active tab on mobile so it's always visible
+            if (
+                el.classList.contains("spa-mobile-tab") &&
+                el.dataset.spaItem === slug
+            ) {
+                el.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "center",
+                });
+            }
         });
     }
 
@@ -364,8 +376,8 @@
         });
     }
 
-    // ─── Sidebar item click ────────────────────────────────────────────────────────
-    function bindSidebarItems() {
+    // ─── Tool item click (Sidebar & Mobile Tabs) ───────────────────────────────────
+    function bindToolItems() {
         document.querySelectorAll("[data-spa-item]").forEach((el) => {
             el.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -395,31 +407,7 @@
         });
     }
 
-    // ─── Mobile sidebar toggle ────────────────────────────────────────────────────
-    function bindMobileToggle() {
-        const toggle = document.getElementById("spa-sidebar-toggle");
-        const drawer = document.getElementById("spa-sidebar-drawer");
-        const overlay = document.getElementById("spa-sidebar-overlay");
-        if (!toggle || !drawer) return;
-
-        const open = () => {
-            drawer.classList.remove("-translate-x-full");
-            overlay?.classList.remove("hidden");
-        };
-        const close = () => {
-            drawer.classList.add("-translate-x-full");
-            overlay?.classList.add("hidden");
-        };
-
-        toggle.addEventListener("click", open);
-        overlay?.addEventListener("click", close);
-
-        document.querySelectorAll("[data-spa-item]").forEach((el) => {
-            el.addEventListener("click", () => {
-                if (window.innerWidth < 1024) close();
-            });
-        });
-    }
+    // ─── (Mobile toggle removed in favor of horizontal tabs) ──────────────────────
 
     // ─── Back / Forward ───────────────────────────────────────────────────────────
     window.addEventListener("popstate", function (e) {
@@ -444,9 +432,8 @@
 
     // ─── Boot ─────────────────────────────────────────────────────────────────────
     document.addEventListener("DOMContentLoaded", function () {
-        bindSidebarItems();
+        bindToolItems();
         bindCategoryFilter();
-        bindMobileToggle();
 
         const initialSlug = slugFromPath();
         if (initialSlug && initialSlug !== "ui" && initialSlug !== "api") {

@@ -100,6 +100,17 @@
     color: #60a5fa;
 }
 
+/* ─── SPA Mobile Tabs ───────────────────────────────────────────────── */
+.spa-mobile-tab:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+.spa-item-active.spa-mobile-tab {
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
 /* ─── Category Filter Pills ─────────────────────────────────────────── */
 .spa-cat-active {
     background-color: #3b82f6;
