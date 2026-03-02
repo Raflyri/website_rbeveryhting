@@ -40,7 +40,7 @@
     <x-header />
 
     {{-- ─── MOBILE: Sidebar overlay backdrop ──────────────────────────────── --}}
-    <div id="spa-sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+    <div id="spa-sidebar-overlay" class="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm hidden lg:hidden"></div>
 
     <main class="min-h-[calc(100vh-160px)] pt-24 relative overflow-x-hidden flex flex-col">
 
@@ -76,13 +76,13 @@
 
                 {{-- ─── SIDEBAR (mobile: drawer, desktop: sticky) ──────────── --}}
                 <aside id="spa-sidebar-drawer"
-                    class="fixed lg:sticky top-0 left-0 z-40 h-screen lg:h-auto lg:z-auto
+                    class="fixed lg:sticky top-0 left-0 z-50 h-[100dvh] lg:h-auto lg:z-auto
                            w-72 lg:w-64 xl:w-72
                            transform -translate-x-full lg:translate-x-0
                            transition-transform duration-300 ease-in-out
                            flex flex-col
                            pt-16 lg:pt-4 lg:top-24
-                           bg-slate-950 lg:bg-transparent">
+                           bg-slate-950 border-r border-white/5 lg:border-none lg:bg-transparent shadow-2xl lg:shadow-none">
 
                     <div class="flex-1 overflow-y-auto px-3 pb-6 space-y-5 scrollbar-hide">
 
