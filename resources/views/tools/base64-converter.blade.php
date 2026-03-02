@@ -42,7 +42,7 @@
     {{-- ─── MOBILE: Sidebar overlay backdrop ──────────────────────────────── --}}
     <div id="spa-sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
 
-    <main class="min-h-[calc(100vh-160px)] pt-24 relative overflow-hidden flex flex-col">
+    <main class="min-h-[calc(100vh-160px)] pt-24 relative overflow-x-hidden flex flex-col">
 
         {{-- Background decorations --}}
         <div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
@@ -56,10 +56,10 @@
                 <div>
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold tracking-widest uppercase mb-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                        Developer Utilities
+                        {{ __('text.dev_utilities') }}
                     </div>
                     <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-                        Base64 <span class="clip-text-gradient">Tools</span>
+                        {{ __('text.b64_title_base64') }} <span class="clip-text-gradient">{{ __('text.b64_title_tools') }}</span>
                     </h1>
                 </div>
 
@@ -67,7 +67,7 @@
                 <button id="spa-sidebar-toggle"
                     class="lg:hidden inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-white/10 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">
                     <i data-feather="menu" class="w-4 h-4"></i>
-                    Tools
+                    {{ __('text.b64_title_tools') }}
                 </button>
             </div>
 
@@ -89,7 +89,7 @@
                         {{-- Category filter pills --}}
                         <div class="flex flex-wrap gap-1.5 pb-1">
                             <button data-spa-category="all" class="spa-cat-active text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
-                                All
+                                {{ __('text.category_all') }}
                             </button>
                             @foreach($endpoints->pluck('category')->unique()->filter()->sort()->values() as $cat)
                             <button data-spa-category="{{ $cat }}" class="spa-cat-inactive text-xs px-3 py-1 rounded-full border font-medium transition-all duration-150">
@@ -100,7 +100,7 @@
 
                         {{-- Tool list --}}
                         @if($endpoints->isEmpty())
-                        <p class="text-sm text-slate-500 px-2">No tools configured yet.</p>
+                        <p class="text-sm text-slate-500 px-2">{{ __('text.no_tools') }}</p>
                         @else
                         @foreach($endpoints->groupBy('category') as $category => $group)
                         <div>
@@ -118,7 +118,7 @@
                                         </span>
                                         <span class="truncate">{{ $endpoint->name }}</span>
                                         @if(empty($endpoint->api_url))
-                                        <span class="ml-auto text-[9px] uppercase tracking-wide bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded">Soon</span>
+                                        <span class="ml-auto text-[9px] uppercase tracking-wide bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded">{{ __('text.soon') }}</span>
                                         @endif
                                     </a>
                                 </li>
@@ -134,18 +134,17 @@
                 <section class="flex-1 min-w-0">
 
                     {{-- Welcome splash (shown until a tool is selected) --}}
-                    <div id="spa-welcome" class="text-center py-20">
+                    <div id="spa-welcome" class="text-center py-10 md:py-20">
                         <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-6">
                             <i data-feather="zap" class="w-10 h-10"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white mb-2">Select a Tool</h2>
+                        <h2 class="text-2xl font-bold text-white mb-2">{{ __('text.select_tool') }}</h2>
                         <p class="text-slate-400 max-w-sm mx-auto text-sm leading-relaxed">
-                            Pick any Base64 tool from the sidebar to get started.
-                            No page reloads — everything happens right here.
+                            {{ __('text.select_tool_desc') }}
                         </p>
                         <div class="mt-8 inline-flex items-center gap-2 text-xs text-slate-600">
                             <i data-feather="arrow-left" class="w-3 h-3"></i>
-                            {{ $endpoints->where('api_url', '!=', null)->count() }} tools available
+                            {{ $endpoints->where('api_url', '!=', null)->count() }} {{ __('text.tools_available') }}
                         </div>
                     </div>
 
@@ -161,6 +160,19 @@
 
     <script>
         feather.replace();
+
+        // Pass translations to SPA JS
+        window.spaTranslations = {
+            validationError: "{{ __('text.validation_error') }}",
+            apiError: "{{ __('text.api_error') }}",
+            failedToLoad: "{{ __('text.failed_to_load') }}",
+            error: "{{ __('text.error') }}",
+            working: "{{ __('text.working') }}",
+            submit: "{{ __('text.submit') }}",
+            downloading: "{{ __('text.downloading') }}",
+            downloadReady: "{{ __('text.download_ready') }}",
+            downloadSaved: "{{ __('text.download_saved') }}"
+        };
     </script>
     <script src="{{ asset('js/tools/base64-spa.js') }}"></script>
 </body>

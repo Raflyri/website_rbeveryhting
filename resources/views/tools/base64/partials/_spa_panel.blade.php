@@ -31,9 +31,9 @@ $hasFileInput = $requestParams->contains('field_type', 'file');
 
     {{-- Validation errors (shown when no-JS fallback POST fails validation) --}}
     @if(!empty($errors) && $errors->any())
-    <div class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-        <div class="font-semibold mb-1">Validation error</div>
-        <ul class="list-disc list-inside space-y-0.5">
+    <div class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200 overflow-x-auto">
+        <div class="font-semibold mb-1">{{ __('text.validation_error') }}</div>
+        <ul class="list-disc list-inside space-y-0.5 whitespace-nowrap">
             @foreach($errors->all() as $errorMessage)
             <li>{{ $errorMessage }}</li>
             @endforeach
@@ -43,18 +43,18 @@ $hasFileInput = $requestParams->contains('field_type', 'file');
 
     {{-- API error --}}
     @if(!empty($error))
-    <div class="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100 spa-error-banner">
-        <div class="font-semibold mb-1">API error</div>
-        <p>{{ $error }}</p>
+    <div class="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100 spa-error-banner overflow-x-auto">
+        <div class="font-semibold mb-1">{{ __('text.api_error') }}</div>
+        <p class="whitespace-nowrap">{{ $error }}</p>
     </div>
     @endif
 
     {{-- Two-column layout --}}
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <div class="grid gap-6 lg:grid-cols-1 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 
         {{-- Left: Request form --}}
-        <div class="glass-card rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-            <h3 class="text-base font-semibold text-slate-200 mb-4">Request</h3>
+        <div class="glass-card rounded-2xl border border-white/10 bg-slate-900/60 p-6 flex flex-col min-w-0">
+            <h3 class="text-base font-semibold text-slate-200 mb-4">{{ __('text.request') }}</h3>
 
             <form
                 method="POST"
@@ -72,7 +72,7 @@ $hasFileInput = $requestParams->contains('field_type', 'file');
                     <label for="spa-{{ $param->field_key }}" class="block text-sm font-medium text-slate-200 mb-1">
                         {{ $param->field_label }}
                         @unless($param->is_required)
-                        <span class="text-slate-500 font-normal">(optional)</span>
+                        <span class="text-slate-500 font-normal">({{ __('text.optional') }})</span>
                         @endunless
                     </label>
                     @endif
@@ -146,20 +146,20 @@ $hasFileInput = $requestParams->contains('field_type', 'file');
 
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-500 active:scale-95 transition-all duration-150 gap-2"
+                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-500 active:scale-95 transition-all duration-150 gap-2 w-full sm:w-auto"
                     data-spa-submit-btn>
                     <i data-feather="{{ $endpoint->icon ?: 'play' }}" class="w-4 h-4"></i>
-                    <span data-spa-btn-label>Submit</span>
+                    <span data-spa-btn-label>{{ __('text.submit') }}</span>
                 </button>
             </form>
         </div>
 
         {{-- Right: Response display --}}
-        <div class="glass-card rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-            <h3 class="text-base font-semibold text-slate-200 mb-4">Response</h3>
-            <div id="spa-response">
+        <div class="glass-card rounded-2xl border border-white/10 bg-slate-900/60 p-6 flex flex-col min-w-0">
+            <h3 class="text-base font-semibold text-slate-200 mb-4">{{ __('text.response') }}</h3>
+            <div id="spa-response" class="w-full">
                 @include('tools.base64.partials._response_display', [
-                'emptyMessage' => 'Submit the form to see the API response.',
+                'emptyMessage' => __('text.empty_response')
                 ])
             </div>
         </div>

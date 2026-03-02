@@ -19,14 +19,14 @@ $responseParams = $endpoint->responseParams()->get();
             @if(in_array($param->field_type, ['code', 'string', 'json']))
             <button
                 type="button"
-                onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.querySelector('[data-value]').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 1500); })"
-                class="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-                Copy
+                onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.querySelector('[data-value]').textContent).then(() => { this.textContent = `{{ __('text.copied') }}`; setTimeout(() => this.textContent = `{{ __('text.copy') }}`, 1500); })"
+                class="text-xs text-blue-400 hover:text-blue-300 transition-colors shrink-0">
+                {{ __('text.copy') }}
             </button>
             @endif
         </div>
 
-        <div data-copyable>
+        <div data-copyable class="max-w-full overflow-x-auto">
             @switch($param->field_type)
             @case('string')
             <div class="rounded-lg bg-slate-800/60 border border-white/5 px-4 py-3 text-sm text-slate-100 font-mono max-h-60 overflow-y-auto break-words whitespace-pre-wrap" data-value>{{ is_array($value) ? json_encode($value) : $value }}</div>
@@ -55,9 +55,9 @@ $responseParams = $endpoint->responseParams()->get();
 
             @case('download_link')
             <a href="{{ $value }}" download
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-600/30 transition-colors">
-                <i data-feather="download" class="w-4 h-4"></i>
-                Download file
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-600/30 transition-colors break-all">
+                <i data-feather="download" class="w-4 h-4 shrink-0"></i>
+                {{ __('text.download_file') }}
             </a>
             @break
 
@@ -75,9 +75,9 @@ $responseParams = $endpoint->responseParams()->get();
 </div>
 @elseif($result && $responseParams->isEmpty())
 {{-- Fallback: no response params defined, show raw JSON --}}
-<pre class="base64-result-pre">{{ is_array($result) ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $result }}</pre>
+<pre class="base64-result-pre max-w-full overflow-x-auto">{{ is_array($result) ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $result }}</pre>
 @else
-<p class="text-sm text-slate-500">
-    {{ $emptyMessage ?? 'Submit the form to see the API response.' }}
+<p class="text-sm text-slate-500 text-center">
+    {{ $emptyMessage ?? __('text.empty_response') }}
 </p>
 @endif

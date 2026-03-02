@@ -22,6 +22,10 @@
     const PANEL_TIMEOUT = 30_000; // ms — panel fetch
     const API_TIMEOUT = 60_000; // ms — API form submit (allow slow external APIs)
 
+    // ─── Translations ────────────────────────────────────────────────────────────
+    const __t = (key, fallback) =>
+        window.spaTranslations ? window.spaTranslations[key] : fallback;
+
     // ─── DOM helpers ─────────────────────────────────────────────────────────────
     const panel = () => document.getElementById("spa-main-panel");
     const welcome = () => document.getElementById("spa-welcome");
@@ -108,7 +112,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          Failed to load tool
+          ${__t("failedToLoad", "Failed to load tool")}
         </div>
         <p class="text-sm font-mono opacity-80">${escHtml(message)}</p>
       </div>`;
@@ -125,7 +129,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          Error
+          ${__t("error", "Error")}
         </div>
         <p class="font-mono opacity-90">${escHtml(message)}</p>
       </div>`;
@@ -153,7 +157,7 @@
         btn.disabled = working;
         btn.classList.toggle("opacity-60", working);
         btn.classList.toggle("cursor-not-allowed", working);
-        if (label && !working) label.textContent = "Submit";
+        if (label && !working) label.textContent = __t("submit", "Submit");
     }
 
     /**
@@ -163,9 +167,10 @@
     function startElapsedTimer(label) {
         if (!label) return () => {};
         const start = Date.now();
+        const workingText = __t("working", "Working...");
         const timer = setInterval(() => {
             const secs = Math.floor((Date.now() - start) / 1000);
-            label.textContent = `Working… ${secs}s`;
+            label.textContent = `${workingText} ${secs}s`;
         }, 1000);
         return () => clearInterval(timer);
     }
@@ -289,7 +294,7 @@
         const label = form.querySelector("[data-spa-btn-label]");
 
         setButtonWorking(btn, label, true);
-        if (label) label.textContent = "Downloading…";
+        if (label) label.textContent = __t("downloading", "Downloading...");
         const stopTimer = startElapsedTimer(label);
 
         try {
@@ -333,8 +338,8 @@
             if (responseBox) {
                 responseBox.innerHTML = `
           <div class="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-            <div class="font-semibold mb-1">Download ready</div>
-            <p>File <span class="font-mono">${escHtml(filename)}</span> has been saved to your downloads folder.</p>
+            <div class="font-semibold mb-1">${__t("downloadReady", "Download ready")}</div>
+            <p>${__t("downloadSaved", "File has been saved to your downloads folder.")} <span class="font-mono">${escHtml(filename)}</span></p>
           </div>`;
             }
         } catch (err) {
