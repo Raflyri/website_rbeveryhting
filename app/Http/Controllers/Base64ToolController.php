@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ResolveIpCountry;
+use App\Models\ApiCallLog;
 use App\Models\Base64ApiEndpoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -169,6 +171,9 @@ class Base64ToolController extends Controller
 
         $elapsed = round((microtime(true) - $startTime) * 1000);
 
+        // ── Build request snippet (hide nothing sensitive for internal dashboard) ──
+        $requestSnippet = substr(json_encode($validated, JSON_UNESCAPED_UNICODE), 0, 500);
+
         if (! $response->successful()) {
             Log::channel('stack')->warning('[Base64 SPA] External API returned non-2xx', [
                 'slug'        => $slug,
@@ -176,11 +181,45 @@ class Base64ToolController extends Controller
                 'body_excerpt' => substr($response->body(), 0, 300),
                 'elapsed_ms'  => $elapsed,
             ]);
+
+            // ── DB log (error) ──
+            $apiLog = ApiCallLog::create([
+                'ip'               => $request->ip(),
+                'url'              => $request->fullUrl(),
+                'api_endpoint'     => $slug,
+                'method'           => $request->method(),
+                'http_status'      => $response->status(),
+                'duration_ms'      => $elapsed,
+                'request_snippet'  => $requestSnippet,
+                'response_snippet' => substr($response->body(), 0, 500),
+                'level'            => 'warning',
+                'message'          => "[Base64 SPA] External API returned HTTP {$response->status()} for {$slug}",
+            ]);
+            ResolveIpCountry::dispatch($apiLog->id);
+
             return response()->json(
                 ['error' => "External API returned HTTP {$response->status()}."],
                 $response->status()
             );
         }
+
+        // ── DB log (success) ──
+        $result = $response->json() ?? $response->body();
+        $responseSnippet = substr(is_string($result) ? $result : json_encode($result, JSON_UNESCAPED_UNICODE), 0, 500);
+
+        $apiLog = ApiCallLog::create([
+            'ip'               => $request->ip(),
+            'url'              => $request->fullUrl(),
+            'api_endpoint'     => $slug,
+            'method'           => $request->method(),
+            'http_status'      => $response->status(),
+            'duration_ms'      => $elapsed,
+            'request_snippet'  => $requestSnippet,
+            'response_snippet' => $responseSnippet,
+            'level'            => 'info',
+            'message'          => "[Base64 SPA] {$endpoint->name} completed in {$elapsed}ms",
+        ]);
+        ResolveIpCountry::dispatch($apiLog->id);
 
         Log::channel('stack')->info('[Base64 SPA] Success', [
             'slug'        => $slug,
@@ -189,8 +228,7 @@ class Base64ToolController extends Controller
         ]);
 
         // Render the response panel HTML so the SPA can inject it
-        $result = $response->json() ?? $response->body();
-        $html   = view('tools.base64.partials._response_display', [
+        $html = view('tools.base64.partials._response_display', [
             'endpoint'     => $endpoint,
             'result'       => $result,
             'error'        => null,
