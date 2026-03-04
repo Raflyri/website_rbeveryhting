@@ -23,6 +23,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -53,8 +54,53 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Allow access to the panel. Ensure you restrict this appropriately
-        // if you have multiple user roles.
-        return true;
+        // Admin Dashboard (rbdashboard) - Only Super Admins and Admins
+        if ($panel->getId() === 'rbdashboard') {
+            return $this->isSuperAdmin() || $this->isAdmin();
+        }
+
+        // Client Area (client) - Everyone can access this (or specifically premium/regular + impersonators)
+        if ($panel->getId() === 'client') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RBAC Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isPremium(): bool
+    {
+        return $this->role === 'premium_user';
+    }
+
+    public function isRegular(): bool
+    {
+        return $this->role === 'regular_user';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Impersonation Helper
+    |--------------------------------------------------------------------------
+    */
+
+    public function canImpersonate(): bool
+    {
+        return $this->isSuperAdmin() || $this->isAdmin();
     }
 }

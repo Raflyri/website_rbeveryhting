@@ -65,3 +65,7 @@ Route::get('/p/{slug}', [PageController::class, 'show'])->name('page.show');
 // --- INSIGHTS (News / Articles / Blog) ---
 Route::get('/insights', [PostController::class, 'index'])->name('insights.index');
 Route::get('/insights/{slug}', [PostController::class, 'show'])->name('insights.show');
+
+// Impersonation
+Route::get('/impersonate/leave', [\App\Http\Controllers\ImpersonationController::class, 'leave'])->name('impersonate.leave');
+Route::get('/impersonate/{user}', [\App\Http\Controllers\ImpersonationController::class, 'enter'])->name('impersonate.enter');
