@@ -27,6 +27,8 @@ class ClientPanelProvider extends PanelProvider
         return $panel
             ->id('client')
             ->path('client-area')
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Amber,
             ])

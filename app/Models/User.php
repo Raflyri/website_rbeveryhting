@@ -22,6 +22,7 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
         'role',
     ];
@@ -47,6 +48,44 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Boot the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->username)) {
+                // Extract part before @
+                $base = explode('@', $user->email)[0];
+                // Clean up non-alphanumeric chars
+                $base = preg_replace('/[^a-zA-Z0-9]/', '', $base);
+                $base = strtolower($base);
+
+                // If it's too short after cleaning, give it a fallback
+                if (strlen($base) < 3) {
+                    $base = 'user' . rand(100, 999);
+                }
+
+                // Truncate base to leave room for suffix if needed
+                $base = substr($base, 0, 15);
+
+                $username = $base;
+                $counter = 1;
+
+                // Ensure uniqueness
+                while (static::where('username', $username)->exists()) {
+                    // Try to append counter, make sure total length <= 17
+                    $suffix = (string) $counter;
+                    $maxBaseLength = 17 - strlen($suffix);
+                    $username = substr($base, 0, $maxBaseLength) . $suffix;
+                    $counter++;
+                }
+
+                $user->username = $username;
+            }
+        });
     }
 
     /**

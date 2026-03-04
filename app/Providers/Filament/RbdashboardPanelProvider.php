@@ -28,7 +28,8 @@ class RbdashboardPanelProvider extends PanelProvider
             ->default()
             ->id('rbdashboard')
             ->path('rbdashboard')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Indigo,
                 'gray' => Color::Slate,

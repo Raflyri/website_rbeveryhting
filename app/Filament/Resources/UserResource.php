@@ -75,6 +75,10 @@ class UserResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true),
+                    Forms\Components\TextInput::make('username')
+                        ->maxLength(17)
+                        ->unique(ignoreRecord: true)
+                        ->hint('Auto-generated from email if left blank on creation.'),
                     Forms\Components\Select::make('role')
                         ->required()
                         ->options([
@@ -98,6 +102,9 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('username')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
