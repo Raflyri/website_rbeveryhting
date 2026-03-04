@@ -9,6 +9,7 @@ use App\Http\Controllers\System\DeploymentController;
 use App\Http\Controllers\Base64ConverterController;
 use App\Http\Controllers\Base64ToolController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 
 // --- SYSTEM DEPLOYMENT ROUTE ---
 Route::get('/system/deploy/trigger', [DeploymentController::class, 'handle']);
@@ -60,3 +61,7 @@ Route::get('/lang/{locale}', function ($locale) {
 
 // --- CMS PAGES ROUTE ---
 Route::get('/p/{slug}', [PageController::class, 'show'])->name('page.show');
+
+// --- INSIGHTS (News / Articles / Blog) ---
+Route::get('/insights', [PostController::class, 'index'])->name('insights.index');
+Route::get('/insights/{slug}', [PostController::class, 'show'])->name('insights.show');
