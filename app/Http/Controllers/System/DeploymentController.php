@@ -27,13 +27,15 @@ class DeploymentController extends Controller
         }
 
         // 2. Define Commands to Run
+        // NOTE: 'storage:link' and 'filament:upgrade' are intentionally excluded.
+        // storage:link calls exec()/symlink() which are disabled on cPanel hosting.
+        // filament:upgrade calls Composer which is unavailable in a web process.
+        // The public/storage symlink must be created once manually via cPanel File Manager.
         $commands = [
-            'migrate' => ['command' => 'migrate', 'params' => ['--force' => true]],
-            'optimize' => ['command' => 'optimize:clear', 'params' => []],
-            'storage' => ['command' => 'storage:link', 'params' => []],
-            'view' => ['command' => 'view:cache', 'params' => []],
-            'config' => ['command' => 'config:cache', 'params' => []],
-            'filament' => ['command' => 'filament:upgrade', 'params' => []],
+            'migrate'  => ['command' => 'migrate',        'params' => ['--force' => true]],
+            'optimize' => ['command' => 'optimize:clear',  'params' => []],
+            'view'     => ['command' => 'view:cache',      'params' => []],
+            'config'   => ['command' => 'config:cache',    'params' => []],
         ];
 
         $results = [];
@@ -56,12 +58,20 @@ class DeploymentController extends Controller
                 }
             }
 
+            // 4. Report symlink status (informational — cannot create via web process on cPanel)
+            $storageLinkPath = public_path('storage');
+            $results['symlink_check'] = [
+                'status'  => is_link($storageLinkPath) ? 'exists' : 'missing',
+                'message' => is_link($storageLinkPath)
+                    ? '✅ public/storage symlink exists.'
+                    : '⚠️  public/storage symlink is MISSING. Create it manually via cPanel File Manager.',
+            ];
+
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Deployment tasks executed.',
                 'results' => $results,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
